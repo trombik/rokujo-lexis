@@ -2,7 +2,7 @@ from collections import Counter
 from ..base import AnalysisStrategy
 
 
-class NounChunkCounter(AnalysisStrategy):
+class ChunkCounter(AnalysisStrategy):
     """
     Counts noun chunks.
 
@@ -21,7 +21,7 @@ class NounChunkCounter(AnalysisStrategy):
         return Counter(chunks)
 
 
-class CompoundNounCounter(AnalysisStrategy):
+class CompoundCounter(AnalysisStrategy):
     """
     Counts compound nouns
     """

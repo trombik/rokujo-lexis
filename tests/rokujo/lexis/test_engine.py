@@ -1,4 +1,4 @@
-from rokujo.analyzer.base import AnalysisStrategy
+from rokujo.lexis.base import AnalysisStrategy
 
 
 class MockStrategy(AnalysisStrategy):

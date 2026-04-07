@@ -1,5 +1,5 @@
 import pytest
-from rokujo.analyzer.base import AnalysisStrategy
+from rokujo.lexis.base import AnalysisStrategy
 
 
 def test_abstract_base_class_cannot_be_instantiated():

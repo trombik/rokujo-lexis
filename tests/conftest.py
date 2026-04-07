@@ -1,5 +1,5 @@
 import pytest
-from rokujo.analyzer.engine import AnalyzerEngine
+from rokujo.lexis.engine import AnalyzerEngine
 
 
 @pytest.fixture(scope="module")

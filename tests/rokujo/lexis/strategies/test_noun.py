@@ -1,13 +1,13 @@
 import pytest
-from rokujo.analyzer.strategies.noun import (
-    CompoundNounCounter,
-    NounChunkCounter
+from rokujo.lexis.strategies.noun import (
+    CompoundCounter,
+    ChunkCounter
 )
 
 
-class TestNounChunkCounter:
+class TestChunkCounter:
     def setup_method(self):
-        self.strategy = NounChunkCounter()
+        self.strategy = ChunkCounter()
 
     def test_excludes_pronoun(self, engine):
         doc = engine.nlp("It was perfect.")
@@ -34,9 +34,9 @@ class TestNounChunkCounter:
             self.strategy.execute(None)
 
 
-class TestCompoundNounCounter:
+class TestCompoundCounter:
     def setup_method(self):
-        self.strategy = CompoundNounCounter()
+        self.strategy = CompoundCounter()
 
     def test_compound_nouns(self, engine):
         doc = engine.nlp("I am studying natural language processing and information security.") # noqa E501
