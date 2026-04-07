@@ -89,6 +89,13 @@ def analyze(
             out_path = Path(output)
         else:
             out_path = file_path.with_suffix(f".{formatter.extension()}")
+
+        if out_path.exists():
+            typer.secho(f"Error: File already exists: {out_path}",
+                        fg=typer.colors.RED,
+                        err=True)
+            raise typer.Exit(1)
+
         out_path.write_text(formatted_data, encoding="utf-8")
         typer.secho(f"Saved to: {out_path}", fg=typer.colors.GREEN, err=True)
 
