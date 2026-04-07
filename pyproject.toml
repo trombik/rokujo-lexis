@@ -1,5 +1,5 @@
 [project]
-name = "rokujo-analyzer-en"
+name = "rokujo-lexis"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -10,7 +10,15 @@ dependencies = [
     "pydantic>=2.12.5",
     "spacy==3.8.13",
     "en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl",
+    "typer>=0.24.1",
 ]
+
+[tool.uv]
+package = true
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
 pythonpath = ["src"]
@@ -22,3 +30,6 @@ addopts = [
 dev = [
     "pytest>=8.0.0",
 ]
+
+[project.scripts]
+lexis = "rokujo.lexis.cli:app"

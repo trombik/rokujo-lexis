@@ -1275,15 +1275,16 @@ wheels = [
 ]
 
 [[package]]
-name = "rokujo-analyzer-en"
+name = "rokujo-lexis"
 version = "0.1.0"
-source = { virtual = "." }
+source = { editable = "." }
 dependencies = [
     { name = "en-core-web-md" },
     { name = "fastapi", extra = ["standard"] },
     { name = "pip" },
     { name = "pydantic" },
     { name = "spacy" },
+    { name = "typer" },
 ]
 
 [package.dev-dependencies]
@@ -1298,6 +1299,7 @@ requires-dist = [
     { name = "pip", specifier = ">=26.0.1" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "spacy", specifier = "==3.8.13" },
+    { name = "typer", specifier = ">=0.24.1" },
 ]
 
 [package.metadata.requires-dev]
