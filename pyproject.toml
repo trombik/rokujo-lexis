@@ -9,14 +9,16 @@ dependencies = [
     "pip>=26.0.1",
     "pydantic>=2.12.5",
     "spacy==3.8.13",
-]
-
-[package.dev-dependencies]
-dev = [
-    { name = "httpx" },
-    { name = "pytest" },
+    "en-core-web-md @ https://github.com/explosion/spacy-models/releases/download/en_core_web_md-3.8.0/en_core_web_md-3.8.0-py3-none-any.whl",
 ]
 
 [tool.pytest.ini_options]
-pythonpath = ["."]
+pythonpath = ["src"]
 testpaths = ["tests"]
+addopts = [
+    "--import-mode=importlib",
+]
+[dependency-groups]
+dev = [
+    "pytest>=8.0.0",
+]
