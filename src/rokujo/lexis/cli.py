@@ -1,3 +1,5 @@
+import sys
+
 import typer
 from pathlib import Path
 from enum import Enum
@@ -33,7 +35,8 @@ app = typer.Typer()
 @app.command()
 def analyze(
     file_path: Path = typer.Argument(..., help="Path to the text file to analyze"), # noqa E501
-    format: FormatType = typer.Option(FormatType.terminal, "--format", "-f"),
+    format_type: FormatType = typer.Option(FormatType.terminal,
+                                           "--format", "-f"),
     output: Optional[Path] = typer.Option(None, "--output", "-o"),
     strategy_name: StrategyType = typer.Option(
         StrategyType.noun, "--strategy", "-s", help="Analysis strategy to use"
@@ -47,6 +50,12 @@ def analyze(
     if not file_path.exists():
         typer.secho(f"Error: File not found: {file_path}", fg=typer.colors.RED)
         raise typer.Exit(code=1)
+
+    if format_type == FormatType.xlsx and str(output) == "-":
+        typer.secho("Error: Excel format does not support output to stdout.",
+                    fg=typer.colors.RED,
+                    err=True)
+        raise typer.Exit(1)
 
     engine = AnalyzerEngine(model=model)
 
@@ -65,20 +74,23 @@ def analyze(
         FormatType.xlsx: ExcelFormatter(),
     }
 
-    if format == FormatType.terminal:
+    if format_type == FormatType.terminal:
         for word, count in result.most_common(20):
             print(f"{count: >4}: {word}")
+            return
+
+    formatter = formatters[format_type]
+    formatted_data = formatter.format(result)
+    if str(output) == "-":
+        sys.stdout.write(formatted_data)
+
     else:
-        formatter = formatters[format]
-        formatted_data = formatter.format(result)
-        out_path = output or file_path.with_suffix(f".{formatter.extension()}")
-
-        if format == FormatType.xlsx:
-            formatted_data.to_excel(out_path, index=False)
+        if output:
+            out_path = Path(output)
         else:
-            out_path.write_text(formatted_data, encoding="utf-8")
-
-        typer.secho(f"Saved to: {out_path}", fg=typer.colors.GREEN)
+            out_path = file_path.with_suffix(f".{formatter.extension()}")
+        out_path.write_text(formatted_data, encoding="utf-8")
+        typer.secho(f"Saved to: {out_path}", fg=typer.colors.GREEN, err=True)
 
 
 if __name__ == "__main__":
