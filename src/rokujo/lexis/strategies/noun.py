@@ -1,4 +1,3 @@
-from collections import Counter
 from ..base import AnalysisStrategy
 
 
@@ -7,7 +6,7 @@ class ChunkCounter(AnalysisStrategy):
     Counts noun chunks.
 
     """
-    def execute(self, doc) -> Counter:
+    def execute(self, doc) -> list[list]:
         if doc is None:
             raise ValueError
 
@@ -18,7 +17,7 @@ class ChunkCounter(AnalysisStrategy):
             words = [t.lemma_.lower() for t in chunk if t.pos_ != "DET"]
             chunks.append(" ".join(words))
 
-        return Counter(chunks)
+        return self._to_freq_list(chunks)
 
 
 class CompoundCounter(AnalysisStrategy):
@@ -26,7 +25,7 @@ class CompoundCounter(AnalysisStrategy):
     Counts compound nouns
     """
 
-    def execute(self, doc) -> Counter:
+    def execute(self, doc) -> list[list]:
         if doc is None:
             raise ValueError
 
@@ -44,4 +43,4 @@ class CompoundCounter(AnalysisStrategy):
         if len(current_compound) > 1:
             compounds.append(" ".join(current_compound))
 
-        return Counter(compounds)
+        return self._to_freq_list(compounds)

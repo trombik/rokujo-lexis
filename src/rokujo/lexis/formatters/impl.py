@@ -1,17 +1,20 @@
 import csv
 import io
-from collections import Counter
 from .base import OutputFormatter
 from typing import Any
 
 
 class CSVFormatter(OutputFormatter):
-    def format(self, data: Counter) -> str:
+    def format(self, data: list) -> str:
         output = io.StringIO()
         writer = csv.writer(output)
         writer.writerow(["Term", "Count"])
-        for term, count in data.most_common():
-            writer.writerow([term, count])
+
+        for item in data:
+            if isinstance(item, list):
+                writer.writerow(item)
+            else:
+                writer.writerow([item])
         return output.getvalue()
 
     def extension(self) -> str:
@@ -19,12 +22,16 @@ class CSVFormatter(OutputFormatter):
 
 
 class TSVFormatter(OutputFormatter):
-    def format(self, data: Counter) -> str:
+    def format(self, data: list) -> str:
         output = io.StringIO()
         writer = csv.writer(output, delimiter="\t")
         writer.writerow(["Term", "Count"])
-        for term, count in data.most_common():
-            writer.writerow([term, count])
+
+        for item in data:
+            if isinstance(item, list):
+                writer.writerow(item)
+            else:
+                writer.writerow([item])
         return output.getvalue()
 
     def extension(self) -> str:
@@ -32,9 +39,12 @@ class TSVFormatter(OutputFormatter):
 
 
 class ExcelFormatter(OutputFormatter):
-    def format(self, data: Counter) -> Any:
+    def format(self, data: list) -> Any:
         import pandas as pd
-        df = pd.DataFrame(data.most_common(), columns=["Term", "Count"])
+        if data and isinstance(data[0], list):
+            df = pd.DataFrame(data, columns=["Term", "Count"])
+        else:
+            df = pd.DataFrame(data, columns=["Term"])
         return df
 
     def extension(self) -> str:

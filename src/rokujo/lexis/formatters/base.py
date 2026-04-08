@@ -5,7 +5,7 @@ from collections import Counter
 
 class OutputFormatter(ABC):
     @abstractmethod
-    def format(self, data: Counter) -> Any:
+    def format(self, data: list) -> Any:
         """
         Perform formatting.
         """
