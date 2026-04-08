@@ -10,6 +10,9 @@ from rokujo.lexis.strategies.noun import (
     CompoundCounter,
     ChunkCounter,
 )
+from rokujo.lexis.strategies.ents import (
+    NumeralExtractor,
+)
 from rokujo.lexis.formatters.impl import (
     CSVFormatter,
     TSVFormatter,
@@ -20,6 +23,7 @@ from rokujo.lexis.formatters.impl import (
 class StrategyType(str, Enum):
     noun = "noun"
     compound = "compound"
+    numeral = "numeral"
 
 
 class FormatType(str, Enum):
@@ -62,6 +66,7 @@ def analyze(
     strategy_map = {
         StrategyType.noun: ChunkCounter(),
         StrategyType.compound: CompoundCounter(),
+        StrategyType.numeral: NumeralExtractor(),
     }
     strategy = strategy_map[strategy_name]
 
