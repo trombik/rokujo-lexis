@@ -14,6 +14,9 @@ class NumeralExtractor(AnalysisStrategy):
     The chunks include not only numerals but also associated contexts that are
     useful for human verification (e.g., "one person", "1.5 MB",
     "roughly 4.2 million koku of rice").
+
+    Returns a list of lists in format: [text, translation, label, frequency]
+    where frequency indicates how many times the phrase appears in the text.
     """
 
     def __init__(self):
@@ -64,8 +67,37 @@ class NumeralExtractor(AnalysisStrategy):
             if result[1] == "" and result[2] == "DATE":
                 results[index][1] = self._en_date_to_ja_date(result[0])
 
-        results.sort()
-        return results
+        # Filter out low-context numeral entries that aren't useful
+        filtered_results = []
+        for result in results:
+            text = result[0].strip()
+
+            # Skip single numerals without context (e.g., "one", "26", "5.")
+            # but keep useful standalone entries like dates, percentages, etc.
+            if len(text.split()) == 1 and result[2] == "":
+                continue
+
+            filtered_results.append(result)
+
+        # Count frequencies and deduplicate
+        frequency_map = {}
+        for result in filtered_results:
+            entry_tuple = tuple(result)  # Convert to tuple for hashability
+            if entry_tuple not in frequency_map:
+                frequency_map[entry_tuple] = 1
+            else:
+                frequency_map[entry_tuple] += 1
+
+        # Convert to final format with frequency as 4th column
+        final_results = []
+        for entry_tuple, frequency in frequency_map.items():
+            # Convert tuple back to list and add frequency
+            result_list = list(entry_tuple)
+            result_list.append(str(frequency))
+            final_results.append(result_list)
+
+        final_results.sort()
+        return final_results
 
     def _find_span_end(self, doc: Doc, start_index: int) -> int:
         """
@@ -167,7 +199,6 @@ class NumeralExtractor(AnalysisStrategy):
     def _en_date_to_ja_date(self, text: str) -> str:
         """ """
 
-        print(text.split())
         if len(text.split()) == 1:
             return self._en_year_to_ja_year_with_one_word(text)
 
