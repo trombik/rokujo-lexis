@@ -5,9 +5,9 @@ from typing import Any
 
 
 class CSVFormatter(OutputFormatter):
-    def format(self, data: list) -> str:
-        output = io.StringIO()
-        writer = csv.writer(output)
+    def format(self, data: list, line_ending: str) -> str:
+        output = io.StringIO(newline="")
+        writer = csv.writer(output, lineterminator=line_ending)
         writer.writerow(["Term", "Count"])
 
         for item in data:
@@ -22,9 +22,9 @@ class CSVFormatter(OutputFormatter):
 
 
 class TSVFormatter(OutputFormatter):
-    def format(self, data: list) -> str:
-        output = io.StringIO()
-        writer = csv.writer(output, delimiter="\t")
+    def format(self, data: list, line_ending: str) -> str:
+        output = io.StringIO(newline="")
+        writer = csv.writer(output, delimiter="\t", lineterminator=line_ending)
         writer.writerow(["Term", "Count"])
 
         for item in data:
@@ -41,6 +41,7 @@ class TSVFormatter(OutputFormatter):
 class ExcelFormatter(OutputFormatter):
     def format(self, data: list) -> Any:
         import pandas as pd
+
         if data and isinstance(data[0], list):
             df = pd.DataFrame(data, columns=["Term", "Count"])
         else:

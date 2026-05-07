@@ -1,4 +1,5 @@
 import sys
+import os
 
 import typer
 from pathlib import Path
@@ -33,20 +34,42 @@ class FormatType(str, Enum):
     terminal = "terminal"
 
 
+class LineEnding(str, Enum):
+    auto = "auto"
+    lf = "lf"
+    crlf = "crlf"
+
+
+def get_os_line_ending():
+    """
+    Detect the appropriate line ending for the current operating system.
+    Returns '\r\n' for Windows, '\n' for Unix-like systems.
+    """
+    return "\r\n" if os.name == "nt" else "\n"
+
+
 app = typer.Typer()
 
 
 @app.command()
 def analyze(
-    file_path: Path = typer.Argument(..., help="Path to the text file to analyze"), # noqa E501
-    format_type: FormatType = typer.Option(FormatType.terminal,
-                                           "--format", "-f"),
+    file_path: Path = typer.Argument(..., help="Path to the text file to analyze"),  # noqa E501
+    format_type: FormatType = typer.Option(FormatType.terminal, "--format", "-f"),
     output: Optional[Path] = typer.Option(None, "--output", "-o"),
     strategy_name: StrategyType = typer.Option(
-        StrategyType.noun, "--strategy", "-s", help="Analysis strategy to use"
+        StrategyType.noun,
+        "--strategy",
+        "-s",
+        help="Analysis strategy to use: noun (count noun chunks), compound (count compound nouns), numeral (extract numeral phrases)",
     ),
-    model: str = typer.Option("en_core_web_md",
-                              "--model", "-m", help="spaCy model name")
+    model: str = typer.Option(
+        "en_core_web_md", "--model", "-m", help="spaCy model name"
+    ),
+    line_ending: LineEnding = typer.Option(
+        LineEnding.auto,
+        "--line-ending",
+        help="Line ending style: crlf (CRLF, RFC 4180 compliant), lf (LF, Unix style), or auto (detect from OS)",
+    ),
 ):
     """
     Analyze a text file using a specific strategy.
@@ -56,9 +79,11 @@ def analyze(
         raise typer.Exit(code=1)
 
     if format_type == FormatType.xlsx and str(output) == "-":
-        typer.secho("Error: Excel format does not support output to stdout.",
-                    fg=typer.colors.RED,
-                    err=True)
+        typer.secho(
+            "Error: Excel format does not support output to stdout.",
+            fg=typer.colors.RED,
+            err=True,
+        )
         raise typer.Exit(1)
 
     engine = AnalyzerEngine(model=model)
@@ -85,7 +110,16 @@ def analyze(
             return
 
     formatter = formatters[format_type]
-    formatted_data = formatter.format(result)
+
+    # Convert line ending enum to actual line ending string
+    if line_ending == LineEnding.auto:
+        line_ending_str = get_os_line_ending()
+    elif line_ending == LineEnding.crlf:
+        line_ending_str = "\r\n"
+    else:  # LineEnding.lf
+        line_ending_str = "\n"
+
+    formatted_data = formatter.format(result, line_ending_str)
     if str(output) == "-":
         sys.stdout.write(formatted_data)
 
@@ -96,9 +130,9 @@ def analyze(
             out_path = file_path.with_suffix(f".{formatter.extension()}")
 
         if out_path.exists():
-            typer.secho(f"Error: File already exists: {out_path}",
-                        fg=typer.colors.RED,
-                        err=True)
+            typer.secho(
+                f"Error: File already exists: {out_path}", fg=typer.colors.RED, err=True
+            )
             raise typer.Exit(1)
 
         out_path.write_text(formatted_data, encoding="utf-8")
