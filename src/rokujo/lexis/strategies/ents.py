@@ -1,3 +1,7 @@
+import re
+from dateutil import parser
+from datetime import datetime
+
 from typing import Callable, List
 from spacy.tokens import Doc
 from ..base import AnalysisStrategy
@@ -42,7 +46,7 @@ class NumeralExtractor(AnalysisStrategy):
                 extended_end = self._find_span_end(doc, ent.end - 1)
                 full_span = doc[ent.start: extended_end]
 
-                results.append([full_span.text, ent.label_])
+                results.append([full_span.text, "", ent.label_])
                 for token in full_span:
                     processed_indices.add(token.i)
 
@@ -57,11 +61,15 @@ class NumeralExtractor(AnalysisStrategy):
             # apply the extra rules
             span_end = self._find_span_end(doc, i)
             span = doc[i:span_end]
-            results.append([span.text, ""])
+            results.append([span.text, "", ""])
 
             for t in span:
                 processed_indices.add(t.i)
             i = span_end
+
+        for index, result in enumerate(results):
+            if result[1] == "" and result[2] == "DATE":
+                results[index][1] = self._en_date_to_ja_date(result[0])
 
         results.sort()
         return results
@@ -120,3 +128,68 @@ class NumeralExtractor(AnalysisStrategy):
             if idx < len(doc) and doc[idx].pos_ in {"NOUN", "PROPN"}:
                 return idx + 1
         return current_end
+
+    def _en_year_to_ja_year_with_one_word(self, text: str) -> str:
+        if len(text.split()) != 1:
+            return ""
+
+        if re.search(r"^\d{1,}$", text):
+            return f"{text}年"
+
+        match = re.search(r"^(\d{3,4})'s$", text)
+        if match:
+            return f"{match.group(1)}年代"
+
+        sentinel_year = 9999
+        default_dt = datetime(sentinel_year, 1, 1)
+
+        try:
+            dt = parser.parse(text, default=default_dt)
+            if dt.year == sentinel_year:
+                return f"{dt.month}月"
+        except (parser.ParserError, OverflowError):
+            pass
+        return ""
+
+    def _en_year_to_ja_year_with_two_words(self, text: str) -> str:
+        if len(text.split()) != 2:
+            return ""
+
+        match = re.search(r"^[Tt]he\s+(\d{3,4})s$", text)
+        if match:
+            return f"{match.group(1)}年代"
+
+        sentinel_year = 9999
+        default_dt = datetime(sentinel_year, 1, 1)
+
+        try:
+            dt = parser.parse(text, default=default_dt)
+            if dt.year == sentinel_year:
+                return f"{dt.month}月{dt.day}日"
+            else:
+                return f"{dt.year}年{dt.month}月"
+        except (parser.ParserError, OverflowError):
+            return ""
+
+    def _en_date_to_ja_date(self, text: str) -> str:
+        """
+        """
+
+        print(text.split())
+        if len(text.split()) == 1:
+            return self._en_year_to_ja_year_with_one_word(text)
+
+        if len(text.split()) == 2:
+            return self._en_year_to_ja_year_with_two_words(text)
+
+        sentinel_year = 9999
+        default_dt = datetime(sentinel_year, 1, 1)
+
+        try:
+            dt = parser.parse(text, default=default_dt)
+            if dt.year == sentinel_year:
+                return f"{dt.month}月{dt.day}日"
+            else:
+                return f"{dt.year}年{dt.month}月{dt.day}日"
+        except (parser.ParserError, OverflowError):
+            return ""

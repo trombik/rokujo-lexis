@@ -138,3 +138,61 @@ class TestNumeralExtractor:
         result = self.strategy.execute(doc)
 
         self.assert_extracted_text("1843", result)
+
+    def test_translate_yyyy_to_year(self, engine):
+        doc = engine.nlp("In April 1, 2026, she was born.")
+        result = self.strategy.execute(doc)
+
+        translated_texts = [item[1] for item in result]
+        assert "2026年" in translated_texts
+
+    @pytest.mark.xfail(reason="Need to implement complex merging logic")
+    def test_the_19xx_s(self, engine):
+        doc = engine.nlp("I like 1970's music.")
+        result = self.strategy.execute(doc)
+
+        translated_texts = [item[1] for item in result]
+        assert "1970年代" in translated_texts
+
+    def test_the_19xxs(self, engine):
+        doc = engine.nlp("It was common in the 1840s.")
+        result = self.strategy.execute(doc)
+
+        translated_texts = [item[1] for item in result]
+        assert "1840年代" in translated_texts
+
+    def test_month_and_year(self, engine):
+        doc = engine.nlp("In January 1871, I was born.")
+        result = self.strategy.execute(doc)
+
+        translated_texts = [item[1] for item in result]
+        assert "1871年1月" in translated_texts
+
+    def test_month_and_year_many_years_ago(self, engine):
+        doc = engine.nlp("In January 171, I was born.")
+        result = self.strategy.execute(doc)
+
+        translated_texts = [item[1] for item in result]
+        assert "171年1月" in translated_texts
+
+    @pytest.mark.xfail(reason="dateutil does not support two-digit year")
+    def test_month_and_year_many_many_years_ago(self, engine):
+        doc = engine.nlp("In January 71, I was born.")
+        result = self.strategy.execute(doc)
+
+        translated_texts = [item[1] for item in result]
+        assert "71年1月" in translated_texts
+
+    def test_day_month_and_year(self, engine):
+        doc = engine.nlp("On 1 March, I was born.")
+        result = self.strategy.execute(doc)
+
+        translated_texts = [item[1] for item in result]
+        assert "3月1日" in translated_texts
+
+    def test_month_only(self, engine):
+        doc = engine.nlp("I was born in Nov.")
+        result = self.strategy.execute(doc)
+
+        translated_texts = [item[1] for item in result]
+        assert "11月" in translated_texts
