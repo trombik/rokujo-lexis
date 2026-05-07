@@ -8,7 +8,6 @@ class CSVFormatter(OutputFormatter):
     def format(self, data: list, line_ending: str) -> str:
         output = io.StringIO(newline="")
         writer = csv.writer(output, lineterminator=line_ending)
-        writer.writerow(["Term", "Count"])
 
         for item in data:
             if isinstance(item, list):
@@ -25,7 +24,6 @@ class TSVFormatter(OutputFormatter):
     def format(self, data: list, line_ending: str) -> str:
         output = io.StringIO(newline="")
         writer = csv.writer(output, delimiter="\t", lineterminator=line_ending)
-        writer.writerow(["Term", "Count"])
 
         for item in data:
             if isinstance(item, list):
@@ -40,13 +38,9 @@ class TSVFormatter(OutputFormatter):
 
 class ExcelFormatter(OutputFormatter):
     def format(self, data: list) -> Any:
-        import pandas as pd
+        import pandas
 
-        if data and isinstance(data[0], list):
-            df = pd.DataFrame(data, columns=["Term", "Count"])
-        else:
-            df = pd.DataFrame(data, columns=["Term"])
-        return df
+        return pandas.DataFrame(data)
 
     def extension(self) -> str:
         return "xlsx"

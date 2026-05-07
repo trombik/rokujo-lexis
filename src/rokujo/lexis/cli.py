@@ -31,7 +31,6 @@ class FormatType(str, Enum):
     csv = "csv"
     tsv = "tsv"
     xlsx = "xlsx"
-    terminal = "terminal"
 
 
 class LineEnding(str, Enum):
@@ -54,7 +53,7 @@ app = typer.Typer()
 @app.command()
 def analyze(
     file_path: Path = typer.Argument(..., help="Path to the text file to analyze"),  # noqa E501
-    format_type: FormatType = typer.Option(FormatType.terminal, "--format", "-f"),
+    format_type: FormatType = typer.Option(FormatType.csv, "--format", "-f"),
     output: Optional[Path] = typer.Option(None, "--output", "-o"),
     strategy_name: StrategyType = typer.Option(
         StrategyType.noun,
@@ -103,11 +102,6 @@ def analyze(
         FormatType.tsv: TSVFormatter(),
         FormatType.xlsx: ExcelFormatter(),
     }
-
-    if format_type == FormatType.terminal:
-        for word, count in result.most_common(20):
-            print(f"{count: >4}: {word}")
-            return
 
     formatter = formatters[format_type]
 
