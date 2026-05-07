@@ -30,21 +30,14 @@ class NumeralExtractor(AnalysisStrategy):
 
         # these labels are simpler than other patterns. doc.ents (almost)
         # correctly captures what we want.
-        simple_labels = {
-            "DATE",
-            "TIME",
-            "MONEY",
-            "PERCENT",
-            "ORDINAL",
-            "QUANTITY"
-        }
+        simple_labels = {"DATE", "TIME", "MONEY", "PERCENT", "ORDINAL", "QUANTITY"}
 
         for ent in doc.ents:
             if ent.label_ in simple_labels:
                 # doc.ents does not necessarily includes useful contexts for
                 # humans. expand the captured result with extra rules.
                 extended_end = self._find_span_end(doc, ent.end - 1)
-                full_span = doc[ent.start: extended_end]
+                full_span = doc[ent.start : extended_end]
 
                 results.append([full_span.text, "", ent.label_])
                 for token in full_span:
@@ -54,7 +47,7 @@ class NumeralExtractor(AnalysisStrategy):
         i = 0
         while i < len(doc):
             token = doc[i]
-            if i in processed_indices or not (token.like_num or token.pos_ == "NUM"): # noqa E510
+            if i in processed_indices or not (token.like_num or token.pos_ == "NUM"):  # noqa E510
                 i += 1
                 continue
 
@@ -109,7 +102,7 @@ class NumeralExtractor(AnalysisStrategy):
         * 123 domains
         * one hundred people
         """
-        if current_end < len(doc) and doc[current_end].pos_ in {"NOUN", "PROPN"}: # noqa E501
+        if current_end < len(doc) and doc[current_end].pos_ in {"NOUN", "PROPN"}:  # noqa E501
             return current_end + 1
         return current_end
 
@@ -172,8 +165,7 @@ class NumeralExtractor(AnalysisStrategy):
             return ""
 
     def _en_date_to_ja_date(self, text: str) -> str:
-        """
-        """
+        """ """
 
         print(text.split())
         if len(text.split()) == 1:

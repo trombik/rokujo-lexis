@@ -7,6 +7,7 @@ class AnalysisStrategy(ABC):
     """
     The base class for the analysis strategies.
     """
+
     @abstractmethod
     def execute(self, doc: Any) -> list:
         pass

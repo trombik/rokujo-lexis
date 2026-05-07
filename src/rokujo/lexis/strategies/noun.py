@@ -6,6 +6,7 @@ class ChunkCounter(AnalysisStrategy):
     Counts noun chunks.
 
     """
+
     def execute(self, doc) -> list[list]:
         if doc is None:
             raise ValueError

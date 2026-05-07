@@ -1,7 +1,5 @@
 import pytest
-from rokujo.lexis.strategies.ents import (
-    NumeralExtractor
-)
+from rokujo.lexis.strategies.ents import NumeralExtractor
 
 
 class TestNumeralExtractor:
@@ -107,7 +105,9 @@ class TestNumeralExtractor:
 
     @pytest.mark.xfail(reason="Need to implement complex merging logic")
     def test_extarct_cardinal_items_with_or_without_dash(self, engine):
-        doc = engine.nlp("He is the twenty-first person to go. She is the twenty second.") # noqa E501
+        doc = engine.nlp(
+            "He is the twenty-first person to go. She is the twenty second."
+        )  # noqa E501
         result = self.strategy.execute(doc)
 
         self.assert_extracted_text("the twenty-first person", result)
@@ -126,7 +126,9 @@ class TestNumeralExtractor:
         self.assert_extracted_text("Jan. 1st", result)
 
     def test_extract_four_point_two_million_of(self, engine):
-        doc = engine.nlp("The shogun controlled land producing roughly 4.2 million koku of rice. One of the students left early.") # noqa E501
+        doc = engine.nlp(
+            "The shogun controlled land producing roughly 4.2 million koku of rice. One of the students left early."
+        )  # noqa E501
         result = self.strategy.execute(doc)
 
         self.assert_extracted_text("roughly 4.2 million koku of rice", result)

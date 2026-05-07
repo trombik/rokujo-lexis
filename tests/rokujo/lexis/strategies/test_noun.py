@@ -1,8 +1,5 @@
 import pytest
-from rokujo.lexis.strategies.noun import (
-    CompoundCounter,
-    ChunkCounter
-)
+from rokujo.lexis.strategies.noun import CompoundCounter, ChunkCounter
 
 
 class TestChunkCounter:
@@ -39,7 +36,9 @@ class TestCompoundCounter:
         self.strategy = CompoundCounter()
 
     def test_compound_nouns(self, engine):
-        doc = engine.nlp("I am studying natural language processing and information security.") # noqa E501
+        doc = engine.nlp(
+            "I am studying natural language processing and information security."
+        )  # noqa E501
         result = self.strategy.execute(doc)
 
         assert "language processing" in [item[0] for item in result]
