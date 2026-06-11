@@ -104,10 +104,11 @@ jobs:
 
       - name: Generate example analysis (Windows)
         if: matrix.runs_on == 'windows-latest'
+        shell: cmd
         run: |
           cd examples
           del *.csv
-          uv run --frozen cmd.exe generate_examples.bat
+          uv run generate_examples.bat
 
       - name: Verify the outputs
         run:
