@@ -63,10 +63,12 @@ class ProperNounCounter(AnalysisStrategy):
             "MONEY",
             "ORDINAL",
             "PERCENT",
+            "QUANTITY",
             "TIME",
         ]
         proper_nouns = []
         for ent in doc.ents:
             if ent.label_ not in ignored_labels:
                 proper_nouns.append(ent.text)
+                print(f"{ent.text}: {ent.label_}")
         return self._to_freq_list(proper_nouns)

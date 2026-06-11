@@ -93,3 +93,11 @@ class TestProperNounCounter:
         assert "Apple" in [item[0] for item in result]
         assert "U.K." in [item[0] for item in result]
         assert "$1 billion" not in [item[0] for item in result]
+
+    def test_ignore_quantity(self, engine):
+        doc = engine.nlp("about 50km (30 miles) southeast of the city of Isfahan.")
+        result = self.strategy.execute(doc)
+
+        print(result)
+        assert "about 50km" not in [item[0] for item in result]
+        assert "30 miles" not in [item[0] for item in result]
