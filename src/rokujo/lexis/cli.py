@@ -143,7 +143,14 @@ def analyze(
             )
             raise typer.Exit(1)
 
-        out_path.write_text(formatted_data, encoding="utf-8")
+        if format_type == "xlsx":
+            formatted_data.to_excel(out_path)
+        else:
+            out_path.write_text(
+                formatted_data,
+                encoding="utf-8",
+            )
+
         typer.secho(f"Saved to: {out_path}", fg=typer.colors.GREEN, err=True)
 
 

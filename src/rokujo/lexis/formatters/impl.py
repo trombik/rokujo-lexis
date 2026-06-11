@@ -37,7 +37,7 @@ class TSVFormatter(OutputFormatter):
 
 
 class ExcelFormatter(OutputFormatter):
-    def format(self, data: list) -> Any:
+    def format(self, data: list, line_ending: str) -> Any:
         import pandas
 
         return pandas.DataFrame(data)
