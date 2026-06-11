@@ -1,11 +1,43 @@
 # rokujo-lexis
 
-A CLI tool to help translators generate terminology files, analyze source
-texts, and avoid inconsistencies.
+`lexis` is a CLI tool to help translators generate terminology files, analyze
+source texts, and avoid inconsistencies. It extracts key linguistic elements
+from source texts into structured CSV files. `lexis` can identify named
+entities, frequently-used nouns, compound nouns, and numeral entities.
+
+## Requirements
+
+* `python` 3.11+ ([Download Python](https://www.python.org/downloads/))
+* `uv` ([Installing uv](https://docs.astral.sh/uv/getting-started/installation/#installing-uv))
+* `git` ([Git - Install](https://git-scm.com/install/))
+
+## Installation
+
+Clone the repository and update the project's environment:
+
+```console
+git clone https://github.com/trombik/rokujo-lexis.git
+cd rokujo-lexis
+uv sync
+```
+
+Optionally, activate the virtual environment:
+
+```console
+# macOS / Linux / Unix variants
+source .venv/bin/activate
+```
+
+```console
+# Windows (PowerShell)
+.venv\Scripts\Activate.ps1
+```
 
 ## Usage
 
 ```console
+> uv run lexis --help
+
  Usage: lexis [OPTIONS] FILE_PATH
 
  Analyze a text file using a specific strategy.
@@ -38,7 +70,7 @@ The following command generates a list of noun chunks in `sample.txt`, writes
 the result to `noun.csv`.
 
 ```console
-lexis -s noun -o noun.csv sample.txt
+uv run lexis -s noun -o noun.csv sample.txt
 ```
 ## Strategies
 
