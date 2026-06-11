@@ -10,6 +10,7 @@ from rokujo.lexis.engine import AnalyzerEngine
 from rokujo.lexis.strategies.noun import (
     CompoundCounter,
     ChunkCounter,
+    ProperNounCounter,
 )
 from rokujo.lexis.strategies.ents import (
     NumeralExtractor,
@@ -22,9 +23,10 @@ from rokujo.lexis.formatters.impl import (
 
 
 class StrategyType(str, Enum):
-    noun = "noun"
     compound = "compound"
+    noun = "noun"
     numeral = "numeral"
+    proper = "proper"
 
 
 class FormatType(str, Enum):
@@ -59,7 +61,13 @@ def analyze(
         StrategyType.noun,
         "--strategy",
         "-s",
-        help="Analysis strategy to use: noun (count noun chunks), compound (count compound nouns), numeral (extract numeral phrases)",
+        help=(
+            "Analysis strategy to use: "
+            "noun (counts noun chunks), "
+            "compound (counts compound nouns), "
+            "proper (counts proper nouns), "
+            "numeral (extracts numeral phrases)"
+        )
     ),
     model: str = typer.Option(
         "en_core_web_md", "--model", "-m", help="spaCy model name"
@@ -67,7 +75,11 @@ def analyze(
     line_ending: LineEnding = typer.Option(
         LineEnding.auto,
         "--line-ending",
-        help="Line ending style: crlf (CRLF, RFC 4180 compliant), lf (LF, Unix style), or auto (detect from OS)",
+        help=(
+            "Line ending style: "
+            "crlf (CRLF, RFC 4180 compliant), "
+            "lf (LF, Unix style), or auto (detect from OS)"
+        )
     ),
 ):
     """
@@ -90,6 +102,7 @@ def analyze(
     strategy_map = {
         StrategyType.noun: ChunkCounter(),
         StrategyType.compound: CompoundCounter(),
+        StrategyType.proper: ProperNounCounter(),
         StrategyType.numeral: NumeralExtractor(),
     }
     strategy = strategy_map[strategy_name]
@@ -125,7 +138,8 @@ def analyze(
 
         if out_path.exists():
             typer.secho(
-                f"Error: File already exists: {out_path}", fg=typer.colors.RED, err=True
+                f"Error: File already exists: {out_path}",
+                fg=typer.colors.RED, err=True
             )
             raise typer.Exit(1)
 

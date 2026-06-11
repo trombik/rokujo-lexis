@@ -45,3 +45,28 @@ class CompoundCounter(AnalysisStrategy):
             compounds.append(" ".join(current_compound))
 
         return self._to_freq_list(compounds)
+
+
+class ProperNounCounter(AnalysisStrategy):
+    """
+    Counts proper nouns.
+    """
+
+    def execute(self, doc) -> list[list]:
+        if doc is None:
+            raise ValueError
+
+        ignored_labels = [
+            "CARDINAL",
+            "DATE",
+            "LANGUAGE",
+            "MONEY",
+            "ORDINAL",
+            "PERCENT",
+            "TIME",
+        ]
+        proper_nouns = []
+        for ent in doc.ents:
+            if ent.label_ not in ignored_labels:
+                proper_nouns.append(ent.text)
+        return self._to_freq_list(proper_nouns)

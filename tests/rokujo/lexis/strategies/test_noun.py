@@ -1,5 +1,5 @@
 import pytest
-from rokujo.lexis.strategies.noun import CompoundCounter, ChunkCounter
+from rokujo.lexis.strategies.noun import (CompoundCounter, ChunkCounter, ProperNounCounter)
 
 
 class TestChunkCounter:
@@ -80,3 +80,16 @@ class TestCompoundCounter:
     def test_raises_value_error_with_none(self, engine):
         with pytest.raises(ValueError):
             self.strategy.execute(None)
+
+
+class TestProperNounCounter:
+    def setup_method(self):
+        self.strategy = ProperNounCounter()
+
+    def test_extracts_products(self, engine):
+        doc = engine.nlp("Apple is looking at buying U.K. startup for $1 billion.")
+        result = self.strategy.execute(doc)
+
+        assert "Apple" in [item[0] for item in result]
+        assert "U.K." in [item[0] for item in result]
+        assert "$1 billion" not in [item[0] for item in result]
