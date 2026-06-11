@@ -128,3 +128,7 @@ Island,7
 ```
 
 For complete results, see [example outputs](examples).
+
+## License
+
+[MIT](LICENSE)
