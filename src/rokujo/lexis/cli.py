@@ -67,7 +67,7 @@ def analyze(
             "compound (counts compound nouns), "
             "proper (counts proper nouns), "
             "numeral (extracts numeral phrases)"
-        )
+        ),
     ),
     model: str = typer.Option(
         "en_core_web_md", "--model", "-m", help="spaCy model name"
@@ -79,7 +79,7 @@ def analyze(
             "Line ending style: "
             "crlf (CRLF, RFC 4180 compliant), "
             "lf (LF, Unix style), or auto (detect from OS)"
-        )
+        ),
     ),
 ):
     """
@@ -138,8 +138,7 @@ def analyze(
 
         if out_path.exists():
             typer.secho(
-                f"Error: File already exists: {out_path}",
-                fg=typer.colors.RED, err=True
+                f"Error: File already exists: {out_path}", fg=typer.colors.RED, err=True
             )
             raise typer.Exit(1)
 

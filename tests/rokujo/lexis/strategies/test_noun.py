@@ -1,5 +1,9 @@
 import pytest
-from rokujo.lexis.strategies.noun import (CompoundCounter, ChunkCounter, ProperNounCounter)
+from rokujo.lexis.strategies.noun import (
+    CompoundCounter,
+    ChunkCounter,
+    ProperNounCounter,
+)
 
 
 class TestChunkCounter:
