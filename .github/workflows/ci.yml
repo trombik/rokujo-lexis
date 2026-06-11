@@ -108,7 +108,7 @@ jobs:
         run: |
           cd examples
           del *.csv
-          uv run generate_examples.bat
+          uv run .\generate_examples.bat
 
       - name: Verify the outputs
         run:
