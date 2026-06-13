@@ -5,6 +5,8 @@ source texts, and avoid inconsistencies. It extracts key linguistic elements
 from source texts into structured CSV files. `lexis` can identify named
 entities, frequently-used nouns, compound nouns, and numeral entities.
 
+For complete results, see [examples](examples).
+
 ## Requirements
 
 * `python` 3.11+ ([Download Python](https://www.python.org/downloads/))
@@ -126,8 +128,6 @@ Army,8
 Island,7
 ...
 ```
-
-For complete results, see [example outputs](examples).
 
 ## License
 
