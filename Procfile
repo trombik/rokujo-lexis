@@ -1,1 +1,1 @@
-web: uvicorn src.rokujo.lexis.api.main:app --host 0.0.0.0 --port 8000
+web: uvicorn src.rokujo.lexis.api.main:app --host 0.0.0.0 --port $PORT
