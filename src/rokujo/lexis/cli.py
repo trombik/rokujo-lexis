@@ -20,6 +20,7 @@ from rokujo.lexis.formatters.impl import (
     TSVFormatter,
     ExcelFormatter,
 )
+from rokujo.lexis.readers import ReaderFactory
 
 
 class StrategyType(str, Enum):
@@ -149,7 +150,8 @@ def analyze(
     combined_text = ""
     for file_path in sorted(target_files):
         typer.secho(f"Reading: {file_path}", fg=typer.colors.CYAN, err=True)
-        combined_text += file_path.read_text(encoding="utf-8") + "\n"
+        reader = ReaderFactory.get_reader(file_path)
+        combined_text += reader.read(file_path)
 
     merged_result = engine.run(combined_text, strategy)
     formatted_data = formatter.format(merged_result, line_ending_str)

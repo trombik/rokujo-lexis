@@ -40,16 +40,17 @@ source .venv/bin/activate
 ```console
 > uv run lexis --help
 
- Usage: lexis [OPTIONS] FILE_PATH
+ Usage: lexis [OPTIONS] PATTERNS...
 
- Analyze a text file using a specific strategy.
+ Analyze multiple files and merge results into a single output.
 
 ╭─ Arguments ─────────────────────────────────────────────────────────────────────────────────────────────╮
-│ *    file_path      PATH  Path to the text file to analyze [required]                                   │
+│ *    patterns      PATTERNS...  Glob patterns or file paths to analyze [required]                       │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ╭─ Options ───────────────────────────────────────────────────────────────────────────────────────────────╮
 │ --format              -f      [csv|tsv|xlsx]                  [default: csv]                            │
-│ --output              -o      PATH                                                                      │
+│ --output              -o      PATH                            Output file path. Use '-' for stdout      │
+│                                                               (text formats only).                      │
 │ --strategy            -s      [compound|noun|numeral|proper]  Analysis strategy to use: noun (counts    │
 │                                                               noun chunks), compound (counts compound   │
 │                                                               nouns), proper (counts proper nouns),     │
@@ -66,6 +67,7 @@ source .venv/bin/activate
 │                                                               copy it or customize the installation.    │
 │ --help                                                        Show this message and exit.               │
 ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+
 ```
 
 The following command generates a list of noun chunks in `sample.txt`, writes
@@ -74,6 +76,14 @@ the result to `noun.csv`.
 ```console
 uv run lexis -s noun -o noun.csv sample.txt
 ```
+
+Supported file extensions are:
+
+* `.txt`
+* `.md`
+* `.docx`
+* `.xlf` and `.xliff`
+
 ## Strategies
 
 The command accepts one of analysis strategies; `noun`, `compound`, `numeral`,
