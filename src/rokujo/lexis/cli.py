@@ -4,7 +4,7 @@ import os
 import typer
 from pathlib import Path
 from enum import Enum
-from typing import Optional
+from typing import Optional, List
 
 from rokujo.lexis.engine import AnalyzerEngine
 from rokujo.lexis.strategies.noun import (
@@ -54,9 +54,16 @@ app = typer.Typer()
 
 @app.command()
 def analyze(
-    file_path: Path = typer.Argument(..., help="Path to the text file to analyze"),  # noqa E501
+    patterns: List[str] = typer.Argument(
+        ..., help="Glob patterns or file paths to analyze"
+    ),
     format_type: FormatType = typer.Option(FormatType.csv, "--format", "-f"),
-    output: Optional[Path] = typer.Option(None, "--output", "-o"),
+    output: Optional[Path] = typer.Option(
+        None,
+        "--output",
+        "-o",
+        help="Output file path. Use '-' for stdout (text formats only).",
+    ),
     strategy_name: StrategyType = typer.Option(
         StrategyType.noun,
         "--strategy",
@@ -83,13 +90,30 @@ def analyze(
     ),
 ):
     """
-    Analyze a text file using a specific strategy.
+    Analyze multiple files and merge results into a single output.
     """
-    if not file_path.exists():
-        typer.secho(f"Error: File not found: {file_path}", fg=typer.colors.RED)
-        raise typer.Exit(code=1)
+    target_files = set()
 
-    if format_type == FormatType.xlsx and str(output) == "-":
+    for pattern in patterns:
+        p = Path(pattern)
+        if p.is_file():
+            target_files.add(p)
+        else:
+            for matched_file in Path(".").glob(pattern):
+                if matched_file.is_file():
+                    target_files.add(matched_file)
+
+    if not target_files:
+        typer.secho(
+            "No files matched the provided patterns or paths.",
+            fg=typer.colors.YELLOW,
+            err=True,
+        )
+        raise typer.Exit(code=0)
+
+    is_stdout = output is not None and str(output) == "-"
+
+    if format_type == FormatType.xlsx and is_stdout:
         typer.secho(
             "Error: Excel format does not support output to stdout.",
             fg=typer.colors.RED,
@@ -107,15 +131,11 @@ def analyze(
     }
     strategy = strategy_map[strategy_name]
 
-    text = file_path.read_text(encoding="utf-8")
-    result = engine.run(text, strategy)
-
     formatters = {
         FormatType.csv: CSVFormatter(),
         FormatType.tsv: TSVFormatter(),
         FormatType.xlsx: ExcelFormatter(),
     }
-
     formatter = formatters[format_type]
 
     # Convert line ending enum to actual line ending string
@@ -126,15 +146,21 @@ def analyze(
     else:  # LineEnding.lf
         line_ending_str = "\n"
 
-    formatted_data = formatter.format(result, line_ending_str)
-    if str(output) == "-":
-        sys.stdout.write(formatted_data)
+    combined_text = ""
+    for file_path in sorted(target_files):
+        typer.secho(f"Reading: {file_path}", fg=typer.colors.CYAN, err=True)
+        combined_text += file_path.read_text(encoding="utf-8") + "\n"
 
+    merged_result = engine.run(combined_text, strategy)
+    formatted_data = formatter.format(merged_result, line_ending_str)
+
+    if is_stdout:
+        sys.stdout.write(formatted_data)
     else:
         if output:
             out_path = Path(output)
         else:
-            out_path = file_path.with_suffix(f".{formatter.extension()}")
+            out_path = Path(f"summary.{formatter.extension()}")
 
         if out_path.exists():
             typer.secho(
@@ -142,7 +168,7 @@ def analyze(
             )
             raise typer.Exit(1)
 
-        if format_type == "xlsx":
+        if format_type == FormatType.xlsx:
             formatted_data.to_excel(out_path)
         else:
             out_path.write_text(
