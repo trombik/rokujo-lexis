@@ -5,7 +5,8 @@ source texts, and avoid inconsistencies. It extracts key linguistic elements
 from source texts into structured CSV files. `lexis` can identify named
 entities, frequently-used nouns, compound nouns, and numeral entities.
 
-For complete results, see [examples](examples).
+For complete results, see [examples](examples) or
+[a demo application](https://rokujo-lexis-production.up.railway.app/).
 
 ## Requirements
 
